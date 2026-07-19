@@ -70,6 +70,61 @@
   openItem(items[0]);
 })();
 
+/* ---------- gallery lightbox (tap to view full-size) ---------- */
+(function galleryLightbox() {
+  var tiles = Array.prototype.slice.call(document.querySelectorAll("#work-gallery .work-tile"));
+  var overlay = document.getElementById("lightbox");
+  var imageEl = document.getElementById("lightbox-image");
+  var captionEl = document.getElementById("lightbox-caption");
+  var closeBtn = document.getElementById("lightbox-close");
+  var prevBtn = document.getElementById("lightbox-prev");
+  var nextBtn = document.getElementById("lightbox-next");
+  if (!tiles.length || !overlay || !imageEl) return;
+
+  var currentIndex = 0;
+
+  function show(index) {
+    currentIndex = (index + tiles.length) % tiles.length;
+    var tile = tiles[currentIndex];
+    var img = tile.querySelector("img");
+    imageEl.src = img.getAttribute("src");
+    imageEl.alt = img.getAttribute("alt") || "";
+    captionEl.textContent = tile.getAttribute("data-caption") || "";
+  }
+
+  function open(index) {
+    show(index);
+    overlay.classList.add("open");
+    overlay.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+
+  function close() {
+    overlay.classList.remove("open");
+    overlay.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+
+  tiles.forEach(function (tile, index) {
+    tile.addEventListener("click", function () { open(index); });
+  });
+
+  closeBtn.addEventListener("click", close);
+  prevBtn.addEventListener("click", function () { show(currentIndex - 1); });
+  nextBtn.addEventListener("click", function () { show(currentIndex + 1); });
+
+  overlay.addEventListener("click", function (e) {
+    if (e.target === overlay) close();
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (!overlay.classList.contains("open")) return;
+    if (e.key === "Escape") close();
+    if (e.key === "ArrowLeft") show(currentIndex - 1);
+    if (e.key === "ArrowRight") show(currentIndex + 1);
+  });
+})();
+
 /* ---------- footer year ---------- */
 (function footerYear() {
   var year = document.getElementById("year");
